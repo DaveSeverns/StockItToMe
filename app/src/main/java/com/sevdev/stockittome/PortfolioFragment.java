@@ -19,7 +19,7 @@ public class PortfolioFragment extends Fragment {
 
     View view;
     ListView listView;
-    public final ArrayList<String> test = new ArrayList<>();
+    public  ArrayList<String> test = new ArrayList<>();
 
     public PortfolioFragment() {
     }
