@@ -22,39 +22,6 @@
 
     <include layout="@layout/content_main" />
 
-    <LinearLayout
-        android:id="@+id/search_layout"
-        android:layout_width="wrap_content"
-        android:layout_marginRight="@dimen/fab_margin"
-        android:layout_height="141dp"
-        android:layout_gravity="bottom"
-        android:background="@color/colorBg"
-        android:orientation="horizontal"
-        android:visibility="invisible"
-        tools:layout_editor_absoluteY="-48dp">
-
-
-        <Button
-            android:id="@+id/save_button"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight=".2"
-            android:text="@string/save_button_text" />
-
-        <EditText
-            android:id="@+id/editStock"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="bottom"
-            android:layout_weight=".8"
-
-            android:ems="18"
-            android:hint="@string/stock_hint"
-            android:inputType="text|textPersonName"
-            tools:layout_editor_absoluteY="519dp" />
-
-    </LinearLayout>
-
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
