@@ -4,4 +4,5 @@
     <string name="action_settings">Ajustes</string>
     <string name="stock_hint">Introduzca el nombre de la empresa o el símbolo de Stock</string>
     <string name="save_button_text">Salvar</string>
+    <string name="dialog_title">Agregar nueva acción a la cartera</string>
 </resources>

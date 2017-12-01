@@ -1,5 +1,6 @@
 package com.sevdev.stockittome;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -14,9 +15,15 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+
 public class MainActivity extends AppCompatActivity {
     EditText stockEditText;
     LinearLayout linearLayout;
+    private final String PORTFOLIO_FILE_NAME = "portfolioFile";
+    File portfolioFile;
+    FileOutputStream stream;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        portfolioFile = new File(this.getFilesDir(),PORTFOLIO_FILE_NAME);
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -67,10 +76,23 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String text = stockInput.getText().toString();
+                try{
+                    stream = openFileOutput(PORTFOLIO_FILE_NAME, Context.MODE_PRIVATE);
+                    stream.write(text.getBytes());
+                    stream.close();
+                    makeToast("Successfully Written to file!");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
                 Toast.makeText(MainActivity.this,text,Toast.LENGTH_SHORT).show();
             }
         });
 
         builder.show();
+    }
+
+    public void makeToast(String message){
+        Toast.makeText(this, message,Toast.LENGTH_SHORT).show();
     }
 }

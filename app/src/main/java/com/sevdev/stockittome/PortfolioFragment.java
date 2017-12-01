@@ -10,6 +10,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
@@ -17,9 +20,10 @@ import java.util.ArrayList;
  */
 public class PortfolioFragment extends Fragment {
 
+    private final String PORTFOLIO_FILE_NAME = "portfolioFile";
     View view;
     ListView listView;
-    public  ArrayList<String> test = new ArrayList<>();
+    public  ArrayList<String> test = getDataForPortfolio();
 
     public PortfolioFragment() {
     }
@@ -27,10 +31,7 @@ public class PortfolioFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        test.add("MSFT");
-        test.add("AAPL");
-        test.add("DOW");
-        test.add("SNAP");
+
         view =  inflater.inflate(R.layout.fragment_portfolio, container, false);
         listView = view.findViewById(R.id.list_portfolio);
         PortfolioAdapter portfolioAdapter = new PortfolioAdapter(getActivity(), test);
@@ -44,5 +45,30 @@ public class PortfolioFragment extends Fragment {
         });
 
         return view;
+    }
+
+
+    public ArrayList<String> getDataForPortfolio(){
+        InputStream fis;
+        ArrayList<String> tempList = new ArrayList<>();
+        final StringBuffer storedString = new StringBuffer();
+
+        try {
+            fis = new FileInputStream(PORTFOLIO_FILE_NAME);
+            DataInputStream dataIO = new DataInputStream(fis);
+            String strLine = null;
+
+            while((strLine = dataIO.readLine()) != null) {
+                storedString.append(strLine);
+                tempList.add(storedString.toString());
+
+            }
+
+            dataIO.close();
+            fis.close();
+        }
+        catch  (Exception e) {
+        }
+        return tempList;
     }
 }
