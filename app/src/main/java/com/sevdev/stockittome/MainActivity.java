@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        portfolioFile = new File(this.getFilesDir(),PORTFOLIO_FILE_NAME);
+        //portfolioFile = new File(this.getFilesDir(),PORTFOLIO_FILE_NAME);
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -76,16 +76,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String text = stockInput.getText().toString();
-                try{
-                    stream = openFileOutput(PORTFOLIO_FILE_NAME, Context.MODE_PRIVATE);
-                    stream.write(text.getBytes());
-                    stream.close();
-                    makeToast("Successfully Written to file!");
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
+                saveToPortfolio(text);
 
-                Toast.makeText(MainActivity.this,text,Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -94,5 +86,20 @@ public class MainActivity extends AppCompatActivity {
 
     public void makeToast(String message){
         Toast.makeText(this, message,Toast.LENGTH_SHORT).show();
+    }
+
+    public void saveToPortfolio(String stockSymbol){
+        stockSymbol += "\n";
+        try{
+            stream = openFileOutput(PORTFOLIO_FILE_NAME, Context.MODE_APPEND);
+            stream.write(stockSymbol.getBytes());
+            stream.close();
+            makeToast("Successfully Written to File: " + PORTFOLIO_FILE_NAME);
+        }catch (Exception e){
+            e.printStackTrace();
+            makeToast("Error Saving to File :"+ PORTFOLIO_FILE_NAME);
+        }
+
+        Toast.makeText(MainActivity.this,stockSymbol,Toast.LENGTH_SHORT).show();
     }
 }

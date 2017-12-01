@@ -10,9 +10,14 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
@@ -23,7 +28,7 @@ public class PortfolioFragment extends Fragment {
     private final String PORTFOLIO_FILE_NAME = "portfolioFile";
     View view;
     ListView listView;
-    public  ArrayList<String> test = getDataForPortfolio();
+    public  ArrayList<String> adapterList;
 
     public PortfolioFragment() {
     }
@@ -34,13 +39,14 @@ public class PortfolioFragment extends Fragment {
 
         view =  inflater.inflate(R.layout.fragment_portfolio, container, false);
         listView = view.findViewById(R.id.list_portfolio);
-        PortfolioAdapter portfolioAdapter = new PortfolioAdapter(getActivity(), test);
+        adapterList = getDataForPortfolio();
+        PortfolioAdapter portfolioAdapter = new PortfolioAdapter(getActivity(), adapterList);
         listView.setAdapter(portfolioAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getActivity(),test.get(position),Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),adapterList.get(position),Toast.LENGTH_LONG).show();
             }
         });
 
@@ -49,26 +55,28 @@ public class PortfolioFragment extends Fragment {
 
 
     public ArrayList<String> getDataForPortfolio(){
-        InputStream fis;
-        ArrayList<String> tempList = new ArrayList<>();
-        final StringBuffer storedString = new StringBuffer();
 
+        ArrayList<String> resultList = new ArrayList<>();
+        //FileOutputStream fos = new FileOutputStream(PORTFOLIO_FILE_NAME, Context.MODE_APPEND);
         try {
-            fis = new FileInputStream(PORTFOLIO_FILE_NAME);
-            DataInputStream dataIO = new DataInputStream(fis);
-            String strLine = null;
+            FileInputStream fis = getActivity().openFileInput(PORTFOLIO_FILE_NAME);
 
-            while((strLine = dataIO.readLine()) != null) {
-                storedString.append(strLine);
-                tempList.add(storedString.toString());
-
+            if (fis != null){
+                InputStreamReader reader = new InputStreamReader(fis);
+                BufferedReader bufferedReader = new BufferedReader(reader);
+                String line = "";
+                try{
+                    while ((line = bufferedReader.readLine()) != null){
+                        resultList.add(line);
+                    }
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
             }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
-            dataIO.close();
-            fis.close();
-        }
-        catch  (Exception e) {
-        }
-        return tempList;
+        return  resultList;
     }
 }
