@@ -1,8 +1,12 @@
 package com.sevdev.stockittome;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -17,6 +21,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 
 public class MainActivity extends AppCompatActivity {
     EditText stockEditText;
@@ -24,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
     private final String PORTFOLIO_FILE_NAME = "portfolioFile";
     File portfolioFile;
     FileOutputStream stream;
+    StockService mService;
+    boolean mBound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +49,21 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //Bind to stock Service
+        Intent intent = new Intent(this, StockService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService(mConnection);
+        mBound = false;
     }
 
     @Override
@@ -91,10 +113,12 @@ public class MainActivity extends AppCompatActivity {
     public void saveToPortfolio(String stockSymbol){
         stockSymbol += "\n";
         try{
-            stream = openFileOutput(PORTFOLIO_FILE_NAME, Context.MODE_APPEND);
+            stream = openFileOutput(PORTFOLIO_FILE_NAME, Context.MODE_PRIVATE);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(stream);
             stream.write(stockSymbol.getBytes());
             stream.close();
             makeToast("Successfully Written to File: " + PORTFOLIO_FILE_NAME);
+            notifyAll();
         }catch (Exception e){
             e.printStackTrace();
             makeToast("Error Saving to File :"+ PORTFOLIO_FILE_NAME);
@@ -102,4 +126,22 @@ public class MainActivity extends AppCompatActivity {
 
         Toast.makeText(MainActivity.this,stockSymbol,Toast.LENGTH_SHORT).show();
     }
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+             StockService.LocalBinder binder = (StockService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
 }
