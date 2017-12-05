@@ -3,11 +3,13 @@ package com.sevdev.stockittome;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
+
 /**
  * Created by davidseverns on 12/3/17.
  */
 
-public class Stock{
+public class Stock implements Serializable{
 
     //keys for JSON object
     public final String SYMBOL_KEY = "Symbol", COMPANY_KEY = "Name", PRICE_KEY = "LastPrice";
@@ -63,4 +65,6 @@ public class Stock{
     public void setCurrentPrice(String currentPrice) {
         this.currentPrice = currentPrice;
     }
+
+
 }

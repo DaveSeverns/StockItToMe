@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public class Porfolio implements Serializable {
 
     private ArrayList<Stock> stocksList;
+
     public Porfolio() {
         super();
         stocksList = new ArrayList<>();
@@ -19,7 +20,7 @@ public class Porfolio implements Serializable {
         stocksList.add(stock);
     }
 
-    public ArrayList getStockPortfolioList(){
+    public ArrayList<Stock> getStockPortfolioList(){
         return stocksList;
     }
 

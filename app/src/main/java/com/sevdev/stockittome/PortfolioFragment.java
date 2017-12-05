@@ -18,6 +18,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
 /**
@@ -29,6 +31,7 @@ public class PortfolioFragment extends Fragment {
     View view;
     ListView listView;
     public  ArrayList<String> adapterList;
+    private Porfolio porfolio;
 
     public PortfolioFragment() {
     }
@@ -39,7 +42,8 @@ public class PortfolioFragment extends Fragment {
 
         view =  inflater.inflate(R.layout.fragment_portfolio, container, false);
         listView = view.findViewById(R.id.list_portfolio);
-        adapterList = getDataForPortfolio();
+        porfolio = getDataForPortfolio();
+        adapterList = getStockListFromPortfolio(porfolio);
         PortfolioAdapter portfolioAdapter = new PortfolioAdapter(getActivity(), adapterList);
         listView.setAdapter(portfolioAdapter);
 
@@ -54,29 +58,40 @@ public class PortfolioFragment extends Fragment {
     }
 
 
-    public ArrayList<String> getDataForPortfolio(){
+    public Porfolio getDataForPortfolio(){
 
-        ArrayList<String> resultList = new ArrayList<>();
+        Porfolio tempPortfolio = new Porfolio();
         //FileOutputStream fos = new FileOutputStream(PORTFOLIO_FILE_NAME, Context.MODE_APPEND);
         try {
             FileInputStream fis = getActivity().openFileInput(PORTFOLIO_FILE_NAME);
 
-            if (fis != null){
-                InputStreamReader reader = new InputStreamReader(fis);
-                BufferedReader bufferedReader = new BufferedReader(reader);
-                String line = "";
-                try{
-                    while ((line = bufferedReader.readLine()) != null){
-                        resultList.add(line);
-                    }
-                }catch (IOException e){
-                    e.printStackTrace();
-                }
+            try{
+                ObjectInputStream ois = new ObjectInputStream(fis);
+
+                tempPortfolio = (Porfolio) ois.readObject();
+
+                Toast.makeText(getActivity(), tempPortfolio.getStockPortfolioList().get(0).getCompanyName(), Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
             }
+
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
-        return  resultList;
+        return  tempPortfolio;
+    }
+
+    public ArrayList<String> getStockListFromPortfolio(Porfolio p){
+        ArrayList<String> tempStockList = new ArrayList<>();
+        for (Stock stock: p.getStockPortfolioList())
+        {
+            tempStockList.add(stock.getStockSymbol());
+        }
+
+        return tempStockList;
     }
 }
