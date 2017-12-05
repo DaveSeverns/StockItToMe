@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#7984c7</color>
     <color name="colorAccent">#a17806</color>
     <color name="colorBg">#ffffff</color>
+    <color name="dialogBgColor">#323355</color>
 </resources>

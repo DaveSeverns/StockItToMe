@@ -31,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
     FileOutputStream stream;
     StockService mService;
     boolean mBound;
+    Stock stock;
+    Porfolio porfolio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //portfolioFile = new File(this.getFilesDir(),PORTFOLIO_FILE_NAME);
+        portfolioFile = new File(this.getFilesDir(),PORTFOLIO_FILE_NAME);
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -56,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         //Bind to stock Service
         Intent intent = new Intent(this, StockService.class);
+
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -99,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 String text = stockInput.getText().toString();
                 saveToPortfolio(text);
+                mService.getStockInfo(text);
 
             }
         });
@@ -118,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
             stream.write(stockSymbol.getBytes());
             stream.close();
             makeToast("Successfully Written to File: " + PORTFOLIO_FILE_NAME);
-            notifyAll();
+            //notifyAll();
         }catch (Exception e){
             e.printStackTrace();
             makeToast("Error Saving to File :"+ PORTFOLIO_FILE_NAME);
@@ -134,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-             StockService.LocalBinder binder = (StockService.LocalBinder) service;
+            StockService.LocalBinder binder = (StockService.LocalBinder) service;
             mService = binder.getService();
             mBound = true;
         }

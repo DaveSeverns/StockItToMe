@@ -15,6 +15,7 @@ public class Stock{
     private String stockSymbol;
     private String companyName;
     private String currentPrice;
+    private JSONObject jsonObject;
 
     public Stock(){
 
@@ -28,10 +29,11 @@ public class Stock{
 
     public Stock(String JSONStockInfo){
         try {
-            JSONObject jsonObject = new JSONObject(JSONStockInfo);
+            jsonObject = new JSONObject(JSONStockInfo);
             stockSymbol = jsonObject.getString(SYMBOL_KEY);
             companyName = jsonObject.getString(COMPANY_KEY);
             currentPrice = jsonObject.getString(PRICE_KEY);
+           // jsonObject.put();
         } catch (JSONException e) {
             e.printStackTrace();
         }
