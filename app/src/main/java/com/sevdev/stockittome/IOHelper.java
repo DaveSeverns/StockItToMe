@@ -22,8 +22,8 @@ public class IOHelper {
     Context context;
     public IOHelper(Context c){
         context = c;
-        File file = new File(context.getFilesDir()+PORTFOLIO_FILE_NAME);
-        Log.e("File Path", file.getAbsolutePath());
+        //File file = new File(context.getFilesDir()+PORTFOLIO_FILE_NAME);
+        Log.e("File Path", "dave is retarded");
 
     }
 

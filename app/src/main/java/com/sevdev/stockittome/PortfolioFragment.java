@@ -87,6 +87,10 @@ public class PortfolioFragment extends android.app.Fragment {
 
     }
 
+    public void addStockToList(String symbol){
+
+    }
+
     public interface PortfolioFragmentInterface{
         public void addStocksToFragment();
     }

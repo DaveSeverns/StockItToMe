@@ -47,9 +47,9 @@ public class StockService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        ioHelper = new IOHelper(getApplicationContext());
-        serviceThread = new ServiceThread();
-        serviceThread.start();
+        //ioHelper = new IOHelper(getApplicationContext());
+        //serviceThread = new ServiceThread();
+        //serviceThread.start();
 
         return mBinder;
     }

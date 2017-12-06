@@ -6,43 +6,34 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.OutputStreamWriter;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements PortfolioFragment.PortfolioFragmentInterface{
-    EditText stockEditText;
-    LinearLayout linearLayout;
+
     private final String PORTFOLIO_FILE_NAME = "portfolioFile.ser";
-    File portfolioFile;
+
     StockService mService;
     boolean mBound;
-    Stock stock;
-    FrameLayout portfolioFrame;
+
     FragmentManager fragmentManager;
     PortfolioFragment portfolioFragment;
     HashMap<String,Stock> porfolioMap = new HashMap<>();
+    IOHelper ioHelper;
 
 
     @Override
@@ -51,10 +42,11 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        ioHelper =  new IOHelper(getApplicationContext());
         fragmentManager = getFragmentManager();
         portfolioFragment = new PortfolioFragment();
-        addStocksToFragment();
-        fragmentManager.beginTransaction().replace(R.id.portfolio_frame, portfolioFragment).commit();
+        //addStocksToFragment();
+        //fragmentManager.beginTransaction().replace(R.id.portfolio_frame, portfolioFragment).commit();
 
 
 
@@ -117,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
             public void onClick(DialogInterface dialog, int which) {
                 String text = stockInput.getText().toString();
 
-                mService.getStockInfo(text);
+                new UpdateListTask().execute(text);
 
 
 
@@ -134,31 +126,10 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
         builder.show();
     }
 
-    @Override
-    public void addStocksToFragment(){
 
 
-        try {
-            FileInputStream fileInputStream = openFileInput(PORTFOLIO_FILE_NAME);
-            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-            porfolioMap = (HashMap) objectInputStream.readObject();
-            Log.e("From file in activity", porfolioMap.toString());
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
 
-        if(porfolioMap.entrySet() != null){
-
-            portfolioFragment.parsePortfolioMap(porfolioMap);
-        }
-        else Toast.makeText(this, "Map Null", Toast.LENGTH_SHORT).show();
-
-    }
 
 
 
@@ -182,5 +153,51 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
         }
     };
 
-   
+
+    @Override
+    public void addStocksToFragment() {
+
+    }
+
+   private class UpdateListTask extends AsyncTask<String,Void,String>{
+
+       public UpdateListTask() {
+           super();
+       }
+
+       @Override
+       protected void onPreExecute() {
+           super.onPreExecute();
+       }
+
+       @Override
+       protected void onPostExecute(String stock) {
+           super.onPostExecute(stock);
+           portfolioFragment.parsePortfolioMap(ioHelper.readFromFile());
+       }
+
+       @Override
+       protected void onProgressUpdate(Void... values) {
+           super.onProgressUpdate(values);
+       }
+
+       @Override
+       protected void onCancelled(Void aVoid) {
+           super.onCancelled(aVoid);
+       }
+
+       @Override
+       protected void onCancelled() {
+           super.onCancelled();
+       }
+
+       @Override
+        protected Void doInBackground(String... strings) {
+           String symbol = strings.toString();
+
+          ioHelper.saveStockToFile(mService.pullJSONFromUrl(symbol));
+           return null;
+       }
+    }
+
 }
