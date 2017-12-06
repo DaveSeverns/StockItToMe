@@ -4,7 +4,8 @@
     <string name="stock_hint">Enter Company Name or Stock Symbol</string>
     <string name="save_button_text">Save</string>
     <string name="dialog_title">Add New Stock to Portfolio</string>
-
+    <string name="company_label">Company</string>
+    <string name="price_label">Last Price</string>
 
 
     <!-- TODO: Remove or change this placeholder text -->

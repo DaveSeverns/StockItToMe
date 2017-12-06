@@ -1,8 +1,10 @@
 package com.sevdev.stockittome;
 
 import android.content.Context;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,7 @@ import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -21,19 +24,28 @@ import java.io.InputStreamReader;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class PortfolioFragment extends Fragment {
+public class PortfolioFragment extends android.app.Fragment {
 
-    private final String PORTFOLIO_FILE_NAME = "portfolioFile";
+    private final String PORTFOLIO_FILE_NAME = "portfolioFile.ser";
     View view;
     ListView listView;
-    public  ArrayList<String> adapterList;
-    private Porfolio porfolio;
+    public  ArrayList<String> adapterList = new ArrayList<>();
+    private HashMap portfolio = new HashMap<>();
+    Context context;
 
     public PortfolioFragment() {
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.context = context;
+
     }
 
     @Override
@@ -42,8 +54,9 @@ public class PortfolioFragment extends Fragment {
 
         view =  inflater.inflate(R.layout.fragment_portfolio, container, false);
         listView = view.findViewById(R.id.list_portfolio);
-        porfolio = getDataForPortfolio();
-        adapterList = getStockListFromPortfolio(porfolio);
+        File file = new File(context.getFilesDir(),PORTFOLIO_FILE_NAME);
+
+
         PortfolioAdapter portfolioAdapter = new PortfolioAdapter(getActivity(), adapterList);
         listView.setAdapter(portfolioAdapter);
 
@@ -58,40 +71,15 @@ public class PortfolioFragment extends Fragment {
     }
 
 
-    public Porfolio getDataForPortfolio(){
+    public void parsePortfolioMap(HashMap<String, Stock> porfolioMap) {
+        String tempSymbol;
 
-        Porfolio tempPortfolio = new Porfolio();
-        //FileOutputStream fos = new FileOutputStream(PORTFOLIO_FILE_NAME, Context.MODE_APPEND);
-        try {
-            FileInputStream fis = getActivity().openFileInput(PORTFOLIO_FILE_NAME);
-
-            try{
-                ObjectInputStream ois = new ObjectInputStream(fis);
-
-                tempPortfolio = (Porfolio) ois.readObject();
-
-                Toast.makeText(getActivity(), tempPortfolio.getStockPortfolioList().get(0).getCompanyName(), Toast.LENGTH_SHORT).show();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        for (HashMap.Entry<String,Stock> entry :
+             porfolioMap.entrySet()) {
+            tempSymbol = entry.getKey();
+            Toast.makeText(context, tempSymbol, Toast.LENGTH_SHORT).show();
+            adapterList.add(tempSymbol);
         }
 
-        return  tempPortfolio;
-    }
-
-    public ArrayList<String> getStockListFromPortfolio(Porfolio p){
-        ArrayList<String> tempStockList = new ArrayList<>();
-        for (Stock stock: p.getStockPortfolioList())
-        {
-            tempStockList.add(stock.getStockSymbol());
-        }
-
-        return tempStockList;
     }
 }

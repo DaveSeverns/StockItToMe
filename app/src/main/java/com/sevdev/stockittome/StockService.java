@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Binder;
+import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.net.URL;
+import java.util.HashMap;
 
 /**
  * Created by davidseverns on 12/3/17.
@@ -28,10 +30,10 @@ import java.net.URL;
 
 public class StockService extends Service {
 
-    private final String PORTFOLIO_FILE_NAME = "portfolioFile";
+    private final String PORTFOLIO_FILE_NAME = "portfolioFile.ser";
 
     private Stock stock;
-    private Porfolio porfolio;
+    private HashMap<String, Stock> stockHashMap = new HashMap<>();
 
     private final IBinder mBinder = new LocalBinder();
 
@@ -48,78 +50,84 @@ public class StockService extends Service {
         }
     }
 
-    public void getStockInfo(final String stockSymbol){
-        new GetStockInfoTask().execute(stockSymbol);
-    }
+    public void getStockInfo(final String symbol){
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                URL stockJSONURL;
 
-    private class GetStockInfoTask extends AsyncTask<String,Void,Void>{
+                try {
+                    stockJSONURL = new URL
+                            ("http://dev.markitondemand.com/MODApis/Api/v2/Quote/json/?symbol=" + symbol);
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stockJSONURL.openStream()));
+                    String tempResponse, response = "";
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-        }
-
-        @Override
-        protected Void doInBackground(String... strings) {
-            String symbol = strings[0];
-
-
-
-            URL stockJSONURL;
-
-            try{
-                stockJSONURL = new URL
-                        ("http://dev.markitondemand.com/MODApis/Api/v2/Quote/json/?symbol="+symbol);
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stockJSONURL.openStream()));
-                String tempResponse, response = "";
-
-                tempResponse = bufferedReader.readLine();
-                while (tempResponse != null){
-                    response = response + tempResponse;
                     tempResponse = bufferedReader.readLine();
+                    while (tempResponse != null) {
+                        response = response + tempResponse;
+                        tempResponse = bufferedReader.readLine();
+                    }
+
+                    JSONObject stockObject = new JSONObject(response);
+                    stock = new Stock(stockObject);
+                    saveStockToFile(stock);
+                    Log.e("Stock data to save :", stock.getCompanyName() + " " + stock.getCurrentPrice());
+                } catch (Exception e) {
+                    Log.d("Error", "Error grabbing stock");
+                    e.printStackTrace();
                 }
-
-                JSONObject stockObject = new JSONObject(response);
-                stock = new Stock(stockObject.toString());
-                saveStockToFile(stock);
-                Log.e("Stock data to save :", stock.getCompanyName() + " " + stock.getCurrentPrice());
-            }catch (Exception e){
-                Log.d("Error", "Error grabbing stock");
-                e.printStackTrace();
             }
-
-            return null;
-        }
+        };
+        t.start();
     }
 
-    public void saveStockToFile(Stock stock){
-        try {
-            porfolio = new Porfolio();
-            porfolio.addStockToPortfolio(stock);
-            FileOutputStream fos = openFileOutput(PORTFOLIO_FILE_NAME, Context.MODE_PRIVATE);
-            try {
-                ObjectOutputStream oos = new ObjectOutputStream(fos);
-                oos.writeObject(porfolio);
-                Log.e("TAG", porfolio.getStockPortfolioList().get(0).getCompanyName());
-                oos.close();
-            } catch (IOException e) {
-                //Log.e("Failed at", "io on the object writer");
-                e.printStackTrace();
-            }
-            fos.close();
 
-        } catch (FileNotFoundException e) {
-            //Log.e("Failed at", "File not found");
-            e.printStackTrace();
-        } catch (IOException e) {
-           // Log.e("Failed at", "io number 2");
-            e.printStackTrace();
-        }
+
+
+
+
+
+
+
+
+    public void saveStockToFile(final Stock stock){
+
+        Thread t = new Thread(){
+            @Override
+            public void run() {
+                try {
+
+                    stockHashMap.put(stock.getStockSymbol(),stock);
+
+                    FileOutputStream fos = null;
+                    fos = openFileOutput(PORTFOLIO_FILE_NAME, Context.MODE_PRIVATE);
+
+                    String path = getFilesDir().getAbsolutePath();
+                    Log.e("path", path);
+                    try {
+
+                        ObjectOutputStream oos = null;
+                        oos = new ObjectOutputStream(fos);
+                        oos.writeObject(stockHashMap);
+
+                        oos.close();
+                    } catch (IOException e) {
+                        Log.e("Failed at", "io on the object writer");
+                        e.printStackTrace();
+                    }
+                    fos.close();
+
+                } catch (FileNotFoundException e) {
+                    //Log.e("Failed at", "File not found");
+                    Log.e("FNFE", "in save block");
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    // Log.e("Failed at", "io number 2");
+                    e.printStackTrace();
+                }
+            }
+        };t.start();
+
     }
 
 }

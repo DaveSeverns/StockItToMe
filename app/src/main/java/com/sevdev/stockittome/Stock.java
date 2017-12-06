@@ -16,29 +16,27 @@ public class Stock implements Serializable{
 
     private String stockSymbol;
     private String companyName;
-    private String currentPrice;
-    private JSONObject jsonObject;
+    private double currentPrice;
+
 
     public Stock(){
 
     }
 
-    public Stock(String stockSymbol, String companyName, String currentPrice){
+    public Stock(String stockSymbol, String companyName, double currentPrice){
         this.stockSymbol = stockSymbol;
         this.companyName = companyName;
         this.currentPrice = currentPrice;
     }
 
-    public Stock(String JSONStockInfo){
-        try {
-            jsonObject = new JSONObject(JSONStockInfo);
+    public Stock(JSONObject jsonObject) throws JSONException{
+
+
             stockSymbol = jsonObject.getString(SYMBOL_KEY);
             companyName = jsonObject.getString(COMPANY_KEY);
-            currentPrice = jsonObject.getString(PRICE_KEY);
+            currentPrice = jsonObject.getDouble(PRICE_KEY);
            // jsonObject.put();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+
     }
 
 
@@ -58,13 +56,14 @@ public class Stock implements Serializable{
         this.companyName = companyName;
     }
 
-    public String getCurrentPrice() {
+    public double getCurrentPrice() {
         return currentPrice;
     }
 
-    public void setCurrentPrice(String currentPrice) {
+    public void setCurrentPrice(double currentPrice) {
         this.currentPrice = currentPrice;
     }
+
 
 
 }

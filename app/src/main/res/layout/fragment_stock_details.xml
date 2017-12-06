@@ -1,0 +1,36 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/details_frame"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.sevdev.stockittome.StockDetailsFragment">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/stock_chart_image"
+            android:layout_marginTop="25dp"
+            android:layout_width="300dp"
+            android:layout_height="170dp"
+            android:layout_gravity="center_horizontal"
+
+            android:src="@drawable/ic_launcher_background" />
+
+        <TextView
+            android:id="@+id/company_name_text"
+            android:text="@string/company_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+
+    </LinearLayout>
+
+
+
+
+
+</FrameLayout>

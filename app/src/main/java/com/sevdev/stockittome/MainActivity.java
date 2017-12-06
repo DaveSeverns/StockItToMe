@@ -1,5 +1,6 @@
 package com.sevdev.stockittome;
 
+import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,23 +17,32 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.OutputStreamWriter;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
     EditText stockEditText;
     LinearLayout linearLayout;
-    private final String PORTFOLIO_FILE_NAME = "portfolioFile";
+    private final String PORTFOLIO_FILE_NAME = "portfolioFile.ser";
     File portfolioFile;
-    FileOutputStream stream;
     StockService mService;
     boolean mBound;
     Stock stock;
-    Porfolio porfolio;
+    FrameLayout portfolioFrame;
+    FragmentManager fragmentManager;
+    PortfolioFragment portfolioFragment;
+    HashMap<String,Stock> porfolioMap = new HashMap<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +50,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        portfolioFile = new File(this.getFilesDir(),PORTFOLIO_FILE_NAME);
+        fragmentManager = getFragmentManager();
+        portfolioFragment = new PortfolioFragment();
+        addStocksToFragment();
+        fragmentManager.beginTransaction().replace(R.id.portfolio_frame, portfolioFragment).commit();
+
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -101,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String text = stockInput.getText().toString();
-                saveToPortfolio(text);
+
                 mService.getStockInfo(text);
 
             }
@@ -110,26 +124,33 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
-    public void makeToast(String message){
-        Toast.makeText(this, message,Toast.LENGTH_SHORT).show();
-    }
+    public void addStocksToFragment(){
 
-    public void saveToPortfolio(String stockSymbol){
-        stockSymbol += "\n";
-        try{
-            stream = openFileOutput(PORTFOLIO_FILE_NAME, Context.MODE_PRIVATE);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(stream);
-            stream.write(stockSymbol.getBytes());
-            stream.close();
-            makeToast("Successfully Written to File: " + PORTFOLIO_FILE_NAME);
-            //notifyAll();
-        }catch (Exception e){
+        portfolioFile = new File(getFilesDir()+PORTFOLIO_FILE_NAME);
+        try {
+            FileInputStream fileInputStream = openFileInput(PORTFOLIO_FILE_NAME);
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            porfolioMap = (HashMap) objectInputStream.readObject();
+
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
-            makeToast("Error Saving to File :"+ PORTFOLIO_FILE_NAME);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
 
-        Toast.makeText(MainActivity.this,stockSymbol,Toast.LENGTH_SHORT).show();
+        if(porfolioMap.entrySet() != null){
+
+            portfolioFragment.parsePortfolioMap(porfolioMap);
+        }
+        else Toast.makeText(this, "Map Null", Toast.LENGTH_SHORT).show();
+
     }
+
+
+
+
 
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -148,4 +169,6 @@ public class MainActivity extends AppCompatActivity {
             mBound = false;
         }
     };
+
+   
 }
