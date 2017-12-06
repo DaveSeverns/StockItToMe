@@ -17,10 +17,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 
-import java.io.File;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements PortfolioFragment.PortfolioFragmentInterface{
@@ -46,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
         fragmentManager = getFragmentManager();
         portfolioFragment = new PortfolioFragment();
         //addStocksToFragment();
-        //fragmentManager.beginTransaction().replace(R.id.portfolio_frame, portfolioFragment).commit();
+        fragmentManager.beginTransaction().replace(R.id.portfolio_frame, portfolioFragment).commit();
 
 
 
@@ -182,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
        }
 
        @Override
-       protected void onCancelled(Void aVoid) {
+       protected void onCancelled(String aVoid) {
            super.onCancelled(aVoid);
        }
 
@@ -192,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
        }
 
        @Override
-        protected Void doInBackground(String... strings) {
+        protected String doInBackground(String... strings) {
            String symbol = strings.toString();
 
           ioHelper.saveStockToFile(mService.pullJSONFromUrl(symbol));

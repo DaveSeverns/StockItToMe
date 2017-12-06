@@ -7,6 +7,7 @@
     <string name="dialog_title">Add New Stock to Portfolio</string>
     <string name="company_label">Company</string>
     <string name="price_label">Last Price</string>
+    <string name="empty_list_text">Click Search Button to add to Portfolio</string>
 
 
 

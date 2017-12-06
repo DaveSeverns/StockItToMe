@@ -2,6 +2,7 @@ package com.sevdev.stockittome;
 
 import android.content.Context;
 import android.os.Environment;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,16 +32,21 @@ import java.util.HashMap;
  */
 public class PortfolioFragment extends android.app.Fragment {
 
-    private final String PORTFOLIO_FILE_NAME = "portfolioFile.ser";
+
     View view;
     ListView listView;
-    public  ArrayList<String> adapterList = new ArrayList<>();
-    private HashMap portfolio = new HashMap<>();
-    Context context;
+    ArrayList<String> adapterList;
     PortfolioAdapter portfolioAdapter;
     PortfolioFragmentInterface parent;
+    IOHelper ioHelper;
 
     public PortfolioFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ioHelper = new IOHelper(getActivity());
     }
 
     @Override
@@ -79,7 +85,7 @@ public class PortfolioFragment extends android.app.Fragment {
         for (HashMap.Entry<String,Stock> entry :
              porfolioMap.entrySet()) {
             tempSymbol = entry.getKey();
-            Toast.makeText(context, tempSymbol, Toast.LENGTH_SHORT).show();
+
             adapterList.add(tempSymbol);
             portfolioAdapter.notifyDataSetChanged();
 

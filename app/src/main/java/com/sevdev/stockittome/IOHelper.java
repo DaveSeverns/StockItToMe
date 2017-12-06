@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -44,6 +45,17 @@ public class IOHelper {
             e.printStackTrace();
         }
         return stockHashMap;
+    }
+
+    public ArrayList<String> getListOfSymbols(){
+        ArrayList<String> stockList = null;
+        HashMap<String,Stock> mapToParse = readFromFile();
+
+        for (HashMap.Entry<String,Stock> entry :
+             mapToParse.entrySet()) {
+            stockList.add(entry.getKey());
+        }
+        return stockList;
     }
 
 
