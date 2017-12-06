@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
@@ -31,11 +33,13 @@ import java.util.HashMap;
 
 public class StockService extends Service {
 
-    private final String PORTFOLIO_FILE_NAME = "portfolioFile.ser";
+
 
     private Stock stock;
     private HashMap<String, Stock> stockHashMap = new HashMap<>();
     private HashMap<String,Stock> porfolioMap;
+    private IOHelper ioHelper;
+    private ServiceThread serviceThread;
 
     private final IBinder mBinder = new LocalBinder();
 
@@ -43,6 +47,10 @@ public class StockService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        ioHelper = new IOHelper(getApplicationContext());
+        serviceThread = new ServiceThread();
+        serviceThread.start();
+
         return mBinder;
     }
 
@@ -56,40 +64,11 @@ public class StockService extends Service {
         Thread t = new Thread() {
             @Override
             public void run() {
-                URL stockJSONURL;
-
-                try {
-                    stockJSONURL = new URL
-                            ("http://dev.markitondemand.com/MODApis/Api/v2/Quote/json/?symbol=" + symbol);
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stockJSONURL.openStream()));
-                    String tempResponse, response = "";
-
-                    tempResponse = bufferedReader.readLine();
-                    while (tempResponse != null) {
-                        response = response + tempResponse;
-                        tempResponse = bufferedReader.readLine();
-                    }
-
-                    JSONObject stockObject = new JSONObject(response);
-                    stock = new Stock(stockObject);
-                    saveStockToFile(stock);
-                    Log.e("Stock data to save :", stock.getCompanyName() + " " + stock.getCurrentPrice());
-                } catch (Exception e) {
-                    Log.d("Error", "Error grabbing stock");
-                    e.printStackTrace();
-                }
+                pullJSONFromUrl(symbol);
             }
         };
         t.start();
     }
-
-
-
-
-
-
-
-
 
 
     public void saveStockToFile(final Stock stock){
@@ -97,55 +76,72 @@ public class StockService extends Service {
         Thread t = new Thread(){
             @Override
             public void run() {
-                try {
 
-                    stockHashMap.put(stock.getStockSymbol(),stock);
-
-                    FileOutputStream fos = null;
-                    fos = openFileOutput(PORTFOLIO_FILE_NAME, Context.MODE_PRIVATE);
-
-                    String path = getFilesDir().getAbsolutePath();
-                    Log.e("path", path);
-                    try {
-
-                        ObjectOutputStream oos = null;
-                        oos = new ObjectOutputStream(fos);
-                        oos.writeObject(stockHashMap);
-
-                        oos.close();
-                    } catch (IOException e) {
-                        Log.e("Failed at", "io on the object writer");
-                        e.printStackTrace();
-                    }
-                    fos.close();
-
-                } catch (FileNotFoundException e) {
-                    //Log.e("Failed at", "File not found");
-                    Log.e("FNFE", "in save block");
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    // Log.e("Failed at", "io number 2");
-                    e.printStackTrace();
-                }
-
-                try {
-                    FileInputStream fileInputStream = openFileInput(PORTFOLIO_FILE_NAME);
-                    ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-                    porfolioMap = (HashMap) objectInputStream.readObject();
-                    Log.e("File Output", porfolioMap.get(stock.getStockSymbol()).getCompanyName());
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
             }
         };t.start();
 
     }
 
+    Handler fileUpdatedHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+
+
+            return false;
+        }
+    });
+
+    public Stock pullJSONFromUrl(String symbol){
+        URL stockJSONURL;
+        Stock tempStock = null;
+
+        try {
+            stockJSONURL = new URL
+                    ("http://dev.markitondemand.com/MODApis/Api/v2/Quote/json/?symbol=" + symbol);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stockJSONURL.openStream()));
+            String tempResponse, response = "";
+
+            tempResponse = bufferedReader.readLine();
+            while (tempResponse != null) {
+                response = response + tempResponse;
+                tempResponse = bufferedReader.readLine();
+            }
+
+            JSONObject stockObject = new JSONObject(response);
+            tempStock = new Stock(stockObject);
+
+
+            Log.e("Stock data to save :", stock.getCompanyName() + " " + stock.getCurrentPrice());
+        } catch (Exception e) {
+            Log.d("Error", "Error grabbing stock");
+            e.printStackTrace();
+        }
+        return tempStock;
+    }
+
+    private class ServiceThread extends Thread{
+        @Override
+        public void run() {
+            super.run();
+            while (true){
+                HashMap<String,Stock> threadMap = ioHelper.readFromFile();
+                if(threadMap != null)
+                {
+                    for (HashMap.Entry<String,Stock> entry
+                            :threadMap.entrySet()) {
+                        ioHelper.saveStockToFile(pullJSONFromUrl(entry.getKey()));
+                        try {
+                            ServiceThread.sleep(60000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+
+            }
+        }
+    }
 }
 
 

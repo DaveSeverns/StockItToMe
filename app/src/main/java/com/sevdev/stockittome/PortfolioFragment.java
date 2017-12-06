@@ -37,6 +37,8 @@ public class PortfolioFragment extends android.app.Fragment {
     public  ArrayList<String> adapterList = new ArrayList<>();
     private HashMap portfolio = new HashMap<>();
     Context context;
+    PortfolioAdapter portfolioAdapter;
+    PortfolioFragmentInterface parent;
 
     public PortfolioFragment() {
     }
@@ -44,7 +46,7 @@ public class PortfolioFragment extends android.app.Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        this.context = context;
+        parent = (PortfolioFragmentInterface) context;
 
     }
 
@@ -54,10 +56,10 @@ public class PortfolioFragment extends android.app.Fragment {
 
         view =  inflater.inflate(R.layout.fragment_portfolio, container, false);
         listView = view.findViewById(R.id.list_portfolio);
-        File file = new File(context.getFilesDir(),PORTFOLIO_FILE_NAME);
 
 
-        PortfolioAdapter portfolioAdapter = new PortfolioAdapter(getActivity(), adapterList);
+
+        portfolioAdapter = new PortfolioAdapter(getActivity(), adapterList);
         listView.setAdapter(portfolioAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -79,7 +81,13 @@ public class PortfolioFragment extends android.app.Fragment {
             tempSymbol = entry.getKey();
             Toast.makeText(context, tempSymbol, Toast.LENGTH_SHORT).show();
             adapterList.add(tempSymbol);
+            portfolioAdapter.notifyDataSetChanged();
+
         }
 
+    }
+
+    public interface PortfolioFragmentInterface{
+        public void addStocksToFragment();
     }
 }

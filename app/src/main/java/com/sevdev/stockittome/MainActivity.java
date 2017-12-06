@@ -13,6 +13,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,7 +31,7 @@ import java.io.ObjectInputStream;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PortfolioFragment.PortfolioFragmentInterface{
     EditText stockEditText;
     LinearLayout linearLayout;
     private final String PORTFOLIO_FILE_NAME = "portfolioFile.ser";
@@ -106,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getSymbol(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.dialog_title);
         final EditText stockInput = new EditText(this);
         builder.setView(stockInput);
@@ -118,19 +119,30 @@ public class MainActivity extends AppCompatActivity {
 
                 mService.getStockInfo(text);
 
+
+
+            }
+        });
+
+        builder.setNegativeButton(R.string.cancel_dialog_button, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
             }
         });
 
         builder.show();
     }
 
+    @Override
     public void addStocksToFragment(){
 
-        portfolioFile = new File(getFilesDir()+PORTFOLIO_FILE_NAME);
+
         try {
             FileInputStream fileInputStream = openFileInput(PORTFOLIO_FILE_NAME);
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
             porfolioMap = (HashMap) objectInputStream.readObject();
+            Log.e("From file in activity", porfolioMap.toString());
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
