@@ -20,6 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ public class StockService extends Service {
 
     private Stock stock;
     private HashMap<String, Stock> stockHashMap = new HashMap<>();
+    private HashMap<String,Stock> porfolioMap;
 
     private final IBinder mBinder = new LocalBinder();
 
@@ -123,6 +125,20 @@ public class StockService extends Service {
                     e.printStackTrace();
                 } catch (IOException e) {
                     // Log.e("Failed at", "io number 2");
+                    e.printStackTrace();
+                }
+
+                try {
+                    FileInputStream fileInputStream = openFileInput(PORTFOLIO_FILE_NAME);
+                    ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+                    porfolioMap = (HashMap) objectInputStream.readObject();
+                    Log.e("File Output", porfolioMap.get(stock.getStockSymbol()).getCompanyName());
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
             }
