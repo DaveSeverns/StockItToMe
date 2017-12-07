@@ -4,9 +4,10 @@
     <string name="stock_hint">Enter Company Name or Stock Symbol</string>
     <string name="save_button_text">Save</string>
     <string name="cancel_dialog_button"> Cancel</string>
-    <string name="dialog_title">Add New Stock to Portfolio</string>
+    <string name="dialog_title">Enter stock symbol, e.g. AAPL for Apple inc.</string>
     <string name="price_label">Last Price:</string>
     <string name="empty_list_text">Click Search Button to add to Portfolio</string>
+    <string name="invalid_input">Unsuccessful, please enter valid stock symbol</string>
 
 
 

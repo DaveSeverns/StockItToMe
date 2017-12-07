@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.HashMap;
 
@@ -182,7 +183,10 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
            /*if(stock.equalsIgnoreCase("Success")){
                portfolioFragment.parsePortfolioMap(ioHelper.readFromFile());
            }*/
-           portfolioFragment.addStockToList(stock);
+           if(stock.equalsIgnoreCase("Fail")){
+               Toast.makeText(MainActivity.this, R.string.invalid_input, Toast.LENGTH_LONG).show();
+           }else {portfolioFragment.addStockToList(stock);}
+
 
        }
 
@@ -206,9 +210,13 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
            String symbol = strings[0];
 
            Stock stockFromService = mService.pullJSONFromUrl(symbol);
+           if(stockFromService != null){
+               ioHelper.saveStockToFile(stockFromService);
+               return symbol;
+           }else {
+               return "Fail";
+           }
 
-           ioHelper.saveStockToFile(stockFromService);
-           return symbol;
        }
     }
 
