@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
     FragmentManager fragmentManager;
     PortfolioFragment portfolioFragment;
     StockDetailsFragment stockDetailsFragment;
-    HashMap<String,Stock> porfolioMap = new HashMap<>();
+    boolean twoPainz;
     IOHelper ioHelper;
 
 
@@ -41,12 +41,16 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ioHelper =  new IOHelper(getApplicationContext());
+        twoPainz = (findViewById(R.id.details_frame) != null);
         fragmentManager = getFragmentManager();
 
         portfolioFragment = new PortfolioFragment();
         stockDetailsFragment = new StockDetailsFragment();
         //addStocksToFragment();
         fragmentManager.beginTransaction().add(R.id.portfolio_frame, portfolioFragment).commit();
+        if(twoPainz){
+            fragmentManager.beginTransaction().add(R.id.details_frame, stockDetailsFragment).commit();
+        }
 
 
 
@@ -126,15 +130,6 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
         builder.show();
     }
 
-
-
-
-
-
-
-
-
-
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection mConnection = new ServiceConnection() {
 
@@ -161,9 +156,12 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
         bundle.putInt("position",position);
         bundle.putString("symbol",symbol);
 
-        getFragmentManager().beginTransaction().replace(R.id.portfolio_frame,stockDetailsFragment).addToBackStack(null).commit();
-        stockDetailsFragment.setArguments(bundle);
-        getFragmentManager().executePendingTransactions();
+        if(!twoPainz){
+            getFragmentManager().beginTransaction().replace(R.id.portfolio_frame,stockDetailsFragment).addToBackStack(null).commit();
+            stockDetailsFragment.setArguments(bundle);
+            getFragmentManager().executePendingTransactions();
+        }
+        stockDetailsFragment.setTwoPaneView(symbol);
 
     }
 
