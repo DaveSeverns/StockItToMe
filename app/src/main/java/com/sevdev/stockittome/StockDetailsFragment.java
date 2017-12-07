@@ -56,7 +56,7 @@ public class StockDetailsFragment extends Fragment {
         Stock stock = ioHelper.getStockBySymbolKey(symbol);
         if(bundle != null){
             companyText.setText(stock.getCompanyName());
-            priceText.setText(""+stock.getCurrentPrice());
+            priceText.setText("$"+stock.getCurrentPrice());
         }
 
         if(stock != null){

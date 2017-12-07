@@ -41,7 +41,8 @@ public class PortfolioAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         TextView textView = new TextView(ctx);
         textView.setText(collection.get(position));
-        textView.setTextSize(20);
+        textView.setTextSize(30);
+
         return textView;
     }
 
