@@ -35,7 +35,7 @@ public class Stock implements Serializable{
             stockSymbol = jsonObject.getString(SYMBOL_KEY);
             companyName = jsonObject.getString(COMPANY_KEY);
             currentPrice = jsonObject.getDouble(PRICE_KEY);
-           // jsonObject.put();
+
 
     }
 

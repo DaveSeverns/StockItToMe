@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements PortfolioFragment.PortfolioFragmentInterface{
 
-    private final String PORTFOLIO_FILE_NAME = "portfolioFile.ser";
+
 
     StockService mService;
     boolean mBound;
