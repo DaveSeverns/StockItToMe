@@ -24,7 +24,6 @@ public class IOHelper {
     public IOHelper(Context c){
         context = c;
         //File file = new File(context.getFilesDir()+PORTFOLIO_FILE_NAME);
-        Log.e("File Path", "dave is retarded");
 
     }
 
@@ -35,7 +34,7 @@ public class IOHelper {
             FileInputStream fileInputStream = context.openFileInput(PORTFOLIO_FILE_NAME);
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
             stockHashMap = (HashMap) objectInputStream.readObject();
-            Log.e("From file in activity", stockHashMap.toString());
+            Log.d("From file in activity", stockHashMap.toString());
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -68,7 +67,7 @@ public class IOHelper {
         try {
             fos = context.openFileOutput(PORTFOLIO_FILE_NAME, Context.MODE_PRIVATE);
             String path = context.getFilesDir().getAbsolutePath();
-            Log.e("path", path);
+            Log.d("Saving to path", path);
             ObjectOutputStream oos = null;
             oos = new ObjectOutputStream(fos);
             oos.writeObject(tempMap);

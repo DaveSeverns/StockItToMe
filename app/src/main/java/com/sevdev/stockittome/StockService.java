@@ -35,9 +35,7 @@ public class StockService extends Service {
 
 
 
-    private Stock stock;
-    private HashMap<String, Stock> stockHashMap = new HashMap<>();
-    private HashMap<String,Stock> porfolioMap;
+
     private IOHelper ioHelper;
     private ServiceThread serviceThread;
 
@@ -47,9 +45,9 @@ public class StockService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        //ioHelper = new IOHelper(getApplicationContext());
-        //serviceThread = new ServiceThread();
-        //serviceThread.start();
+        ioHelper = new IOHelper(getApplicationContext());
+        serviceThread = new ServiceThread();
+        serviceThread.start();
 
         return mBinder;
     }
@@ -71,25 +69,6 @@ public class StockService extends Service {
     }
 
 
-    public void saveStockToFile(final Stock stock){
-
-        Thread t = new Thread(){
-            @Override
-            public void run() {
-
-            }
-        };t.start();
-
-    }
-
-    Handler fileUpdatedHandler = new Handler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(Message msg) {
-
-
-            return false;
-        }
-    });
 
     public Stock pullJSONFromUrl(String symbol){
         URL stockJSONURL;
@@ -111,9 +90,9 @@ public class StockService extends Service {
             tempStock = new Stock(stockObject);
 
 
-            Log.e("Stock data to save :", tempStock.getCompanyName() + " " + tempStock.getCurrentPrice());
+            Log.d("Stock data to save :", tempStock.getCompanyName() + " " + tempStock.getCurrentPrice());
         } catch (Exception e) {
-            Log.d("Error", "Error grabbing stock");
+            Log.e("Error", "Error grabbing stock");
             e.printStackTrace();
         }
         return tempStock;
@@ -131,7 +110,9 @@ public class StockService extends Service {
                             :threadMap.entrySet()) {
                         ioHelper.saveStockToFile(pullJSONFromUrl(entry.getKey()));
                         try {
+                            Log.d("ServiceThread Ran Sleeping for 60 sec, CurrentState of file",threadMap.toString());
                             ServiceThread.sleep(60000);
+
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

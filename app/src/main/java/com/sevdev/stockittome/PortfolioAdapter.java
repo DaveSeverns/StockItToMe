@@ -2,6 +2,7 @@ package com.sevdev.stockittome;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -41,7 +42,8 @@ public class PortfolioAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         TextView textView = new TextView(ctx);
         textView.setText(collection.get(position));
-        textView.setTextSize(30);
+        textView.setTextSize(38);
+        textView.setGravity(Gravity.CENTER);
 
         return textView;
     }
