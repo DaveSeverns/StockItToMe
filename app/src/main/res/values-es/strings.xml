@@ -4,5 +4,8 @@
     <string name="action_settings">Ajustes</string>
     <string name="stock_hint">Introduzca el nombre de la empresa o el símbolo de Stock</string>
     <string name="save_button_text">Salvar</string>
+    <string name="cancel_dialog_button">Cancelar</string>
     <string name="dialog_title">Agregar nueva acción a la cartera</string>
+    <string name="price_label">Ultimo Precio:</string>
+    <string name="empty_list_text">Haga clic en el botón de búsqueda para agregar a la cartera</string>
 </resources>
