@@ -179,9 +179,10 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
        @Override
        protected void onPostExecute(String stock) {
            super.onPostExecute(stock);
-           if(stock.equalsIgnoreCase("Success")){
+           /*if(stock.equalsIgnoreCase("Success")){
                portfolioFragment.parsePortfolioMap(ioHelper.readFromFile());
-           }
+           }*/
+           portfolioFragment.addStockToList(stock);
 
        }
 
@@ -207,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
            Stock stockFromService = mService.pullJSONFromUrl(symbol);
 
            ioHelper.saveStockToFile(stockFromService);
-           return "Success";
+           return symbol;
        }
     }
 

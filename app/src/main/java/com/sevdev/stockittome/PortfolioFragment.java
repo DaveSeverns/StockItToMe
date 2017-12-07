@@ -108,6 +108,8 @@ public class PortfolioFragment extends android.app.Fragment {
     }
 
     public void addStockToList(String symbol){
+            adapterList.add(symbol.toUpperCase());
+            portfolioAdapter.notifyDataSetChanged();
 
     }
 
