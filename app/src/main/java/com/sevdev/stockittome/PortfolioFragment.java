@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -37,7 +38,7 @@ public class PortfolioFragment extends android.app.Fragment {
     ListView listView;
     ArrayList<String> adapterList;
     PortfolioAdapter portfolioAdapter;
-    PortfolioFragmentInterface parent;
+    PortfolioFragmentInterface portfolioFragmentInterface;
     IOHelper ioHelper;
 
     public PortfolioFragment() {
@@ -52,7 +53,12 @@ public class PortfolioFragment extends android.app.Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        parent = (PortfolioFragmentInterface) context;
+        if(context instanceof PortfolioFragmentInterface){
+            portfolioFragmentInterface = (PortfolioFragmentInterface) context;
+        }else{
+            throw new RuntimeException(context.toString() + "needs to implement PortfolioFragmentInterface");
+        }
+
 
     }
 
@@ -60,10 +66,16 @@ public class PortfolioFragment extends android.app.Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        if(container != null){
+            container.removeAllViews();
+        }
+
         view =  inflater.inflate(R.layout.fragment_portfolio, container, false);
+        adapterList = ioHelper.getListOfSymbols();
         listView = view.findViewById(R.id.list_portfolio);
 
-
+        TextView emptyListText = view.findViewById(R.id.emptyStockText);
+        listView.setEmptyView(emptyListText);
 
         portfolioAdapter = new PortfolioAdapter(getActivity(), adapterList);
         listView.setAdapter(portfolioAdapter);
@@ -72,6 +84,8 @@ public class PortfolioFragment extends android.app.Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Toast.makeText(getActivity(),adapterList.get(position),Toast.LENGTH_LONG).show();
+
+                portfolioFragmentInterface.stockItemSelected(position,adapterList.get(position));
             }
         });
 
@@ -98,6 +112,6 @@ public class PortfolioFragment extends android.app.Fragment {
     }
 
     public interface PortfolioFragmentInterface{
-        public void addStocksToFragment();
+        void stockItemSelected(int position, String symbol);
     }
 }

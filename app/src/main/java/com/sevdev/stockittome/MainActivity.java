@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
 
     FragmentManager fragmentManager;
     PortfolioFragment portfolioFragment;
+    StockDetailsFragment stockDetailsFragment;
     HashMap<String,Stock> porfolioMap = new HashMap<>();
     IOHelper ioHelper;
 
@@ -41,9 +42,11 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
         setSupportActionBar(toolbar);
         ioHelper =  new IOHelper(getApplicationContext());
         fragmentManager = getFragmentManager();
+
         portfolioFragment = new PortfolioFragment();
+        stockDetailsFragment = new StockDetailsFragment();
         //addStocksToFragment();
-        fragmentManager.beginTransaction().replace(R.id.portfolio_frame, portfolioFragment).commit();
+        fragmentManager.beginTransaction().add(R.id.portfolio_frame, portfolioFragment).commit();
 
 
 
@@ -152,7 +155,15 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
 
 
     @Override
-    public void addStocksToFragment() {
+    public void stockItemSelected(int position, String symbol) {
+
+        Bundle bundle = new Bundle();
+        bundle.putInt("position",position);
+        bundle.putString("symbol",symbol);
+
+        getFragmentManager().beginTransaction().replace(R.id.portfolio_frame,stockDetailsFragment).addToBackStack(null).commit();
+        stockDetailsFragment.setArguments(bundle);
+        getFragmentManager().executePendingTransactions();
 
     }
 
@@ -170,7 +181,10 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
        @Override
        protected void onPostExecute(String stock) {
            super.onPostExecute(stock);
-           portfolioFragment.parsePortfolioMap(ioHelper.readFromFile());
+           if(stock.equalsIgnoreCase("Success")){
+               portfolioFragment.parsePortfolioMap(ioHelper.readFromFile());
+           }
+
        }
 
        @Override
@@ -190,10 +204,12 @@ public class MainActivity extends AppCompatActivity implements PortfolioFragment
 
        @Override
         protected String doInBackground(String... strings) {
-           String symbol = strings.toString();
+           String symbol = strings[0];
 
-          ioHelper.saveStockToFile(mService.pullJSONFromUrl(symbol));
-           return null;
+           Stock stockFromService = mService.pullJSONFromUrl(symbol);
+
+           ioHelper.saveStockToFile(stockFromService);
+           return "Success";
        }
     }
 

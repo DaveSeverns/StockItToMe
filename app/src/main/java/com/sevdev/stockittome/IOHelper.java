@@ -29,7 +29,7 @@ public class IOHelper {
     }
 
     public HashMap readFromFile() {
-        HashMap<String, Stock> stockHashMap = null;
+        HashMap<String, Stock> stockHashMap = new HashMap<>();
 
         try {
             FileInputStream fileInputStream = context.openFileInput(PORTFOLIO_FILE_NAME);
@@ -48,7 +48,7 @@ public class IOHelper {
     }
 
     public ArrayList<String> getListOfSymbols(){
-        ArrayList<String> stockList = null;
+        ArrayList<String> stockList = new ArrayList<>();
         HashMap<String,Stock> mapToParse = readFromFile();
 
         for (HashMap.Entry<String,Stock> entry :
@@ -61,9 +61,10 @@ public class IOHelper {
 
     public boolean saveStockToFile(Stock stock){
         boolean saved = false;
+        //TODO if this fails add the load back in.
         HashMap<String,Stock> tempMap = readFromFile();
         tempMap.put(stock.getStockSymbol(),stock);
-        FileOutputStream fos = null;
+        FileOutputStream fos;
         try {
             fos = context.openFileOutput(PORTFOLIO_FILE_NAME, Context.MODE_PRIVATE);
             String path = context.getFilesDir().getAbsolutePath();
@@ -81,5 +82,14 @@ public class IOHelper {
         }
 
         return saved;
+    }
+
+    public Stock getStockBySymbolKey(String symbol){
+        Stock tempStock = new Stock();
+        HashMap<String,Stock> stringStockHashMap = readFromFile();
+        if(stringStockHashMap != null){
+            tempStock = stringStockHashMap.get(symbol);
+        }
+        return  tempStock;
     }
 }

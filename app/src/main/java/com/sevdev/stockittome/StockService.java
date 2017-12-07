@@ -111,7 +111,7 @@ public class StockService extends Service {
             tempStock = new Stock(stockObject);
 
 
-            Log.e("Stock data to save :", stock.getCompanyName() + " " + stock.getCurrentPrice());
+            Log.e("Stock data to save :", tempStock.getCompanyName() + " " + tempStock.getCurrentPrice());
         } catch (Exception e) {
             Log.d("Error", "Error grabbing stock");
             e.printStackTrace();
