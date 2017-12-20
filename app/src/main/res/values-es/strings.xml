@@ -9,4 +9,6 @@
     <string name="price_label">Ultimo Precio:</string>
     <string name="empty_list_text">Haga clic en el botón de búsqueda para agregar a la cartera</string>
     <string name="invalid_input">Sin éxito, ingrese un símbolo de stock válido</string>
+    <string name="stock_symbol_on_card_view">Stock Symbol</string>
+    <string name="stock_price_on_card_view">Stock Price</string>
 </resources>

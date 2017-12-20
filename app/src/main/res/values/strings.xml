@@ -8,6 +8,8 @@
     <string name="price_label">Last Price:</string>
     <string name="empty_list_text">Click Search Button to add to Portfolio</string>
     <string name="invalid_input">Unsuccessful, please enter valid stock symbol</string>
+    <string name="stock_symbol_on_card_view">Stock Symbol</string>
+    <string name="stock_price_on_card_view">Stock Price</string>
 
 
 
